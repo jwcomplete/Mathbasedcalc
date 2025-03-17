@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# Set Page Configuration for Better UI
+# Set Page Configuration for a Compact UI
 st.set_page_config(page_title="Home Affordability Calculator", layout="wide")
 
 # Define Loan Limits
@@ -59,30 +59,24 @@ def calculate_loan(purchase_price, interest_rate, loan_term, formula, property_t
 
     return total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment, monthly_property_tax, monthly_home_insurance, monthly_flood_insurance
 
-# UI Layout
+# Compact UI Layout
 st.title("🏡 Home Affordability Calculator")
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
-    occupancy_type = st.selectbox("🏠 Occupancy Type", ["Primary Residence", "Second Home", "Investment Property"])
-    num_units = st.selectbox("🏢 Number of Units", [1, 2, 3, 4])
-    purchase_price = st.number_input("💰 Purchase Price ($)", min_value=50000, max_value=2000000, step=5000, format="%.0f")
+    occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
+    num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
+    purchase_price = st.number_input("💰 Price ($)", min_value=50000, max_value=2000000, step=5000, format="%.0f")
 
 with col2:
-    loan_term = st.number_input("📆 Loan Term (Years)", min_value=5, max_value=30, step=5, value=30)
-    interest_rate = st.number_input("📊 Interest Rate (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f")
-
-st.markdown("---")
-
-col3, col4, col5 = st.columns(3)
+    loan_term = st.number_input("📆 Term (Years)", min_value=5, max_value=30, step=5, value=30)
+    interest_rate = st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f")
 
 with col3:
-    property_tax = st.number_input("🏡 Annual Property Tax ($)", min_value=0, max_value=50000, step=100, format="%.0f")
-with col4:
-    home_insurance = st.number_input("🔒 Annual Home Insurance ($)", min_value=0, max_value=20000, step=100, format="%.0f")
-with col5:
-    flood_insurance = st.number_input("🌊 Annual Flood Insurance ($)", min_value=0, max_value=20000, step=100, format="%.0f")
+    property_tax = st.number_input("🏡 Tax ($)", min_value=0, max_value=50000, step=100, format="%.0f")
+    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0, max_value=20000, step=100, format="%.0f")
+    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0, max_value=20000, step=100, format="%.0f")
 
 st.markdown("---")
 
@@ -91,28 +85,30 @@ eligible_formulas = []
 for formula, values in loan_formulas.items():
     max_price = (conforming_loan_limit / (1 - values["down_payment"] / 100)) * (1 - values["seller_concession"] / 100)
 
-    # Check if purchase price and LTV restrictions are met
     if purchase_price <= max_price and values["max_ltv"] <= ltv_limits.get(occupancy_type, {}).get(num_units, 0):
         eligible_formulas.append(formula)
 
-selected_formula = st.selectbox("📜 Select Loan Formula", eligible_formulas)
+selected_formula = st.selectbox("📜 Loan Formula", eligible_formulas)
 
-# Calculate Loan Details
-if st.button("🧮 Calculate Loan Details"):
+if st.button("🧮 Calculate"):
     total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment, monthly_property_tax, monthly_home_insurance, monthly_flood_insurance = calculate_loan(
         purchase_price, interest_rate, loan_term, selected_formula, property_tax, home_insurance, flood_insurance
     )
 
-    # Display Results
-    st.markdown("## 💰 Loan Calculation Results")
-    st.info(f"**Total Sale Price (Including Seller Concession):** ${total_sale_price:,.2f}")
-    st.success(f"**Loan Amount (LTV-Based):** ${loan_amount:,.2f}")
-    st.warning(f"**Cash to Close (Down Payment + Costs):** ${cash_to_close:,.2f}")
-    st.markdown("### 📌 Monthly Payments Breakdown")
-    st.write(f"**Principal & Interest:** ${monthly_payment:,.2f}")
-    st.write(f"**Property Tax:** ${monthly_property_tax:,.2f}")
-    st.write(f"**Home Insurance:** ${monthly_home_insurance:,.2f}")
-    st.write(f"**Flood Insurance:** ${monthly_flood_insurance:,.2f}")
-    st.markdown("---")
-    st.error(f"### **Total Monthly Payment:** ${total_monthly_payment:,.2f}")
+    # Compact Results Display
+    colA, colB, colC = st.columns([1, 1, 1])
+
+    with colA:
+        st.info(f"💰 **Total Sale Price:** ${total_sale_price:,.2f}")
+        st.success(f"🏦 **Loan Amount:** ${loan_amount:,.2f}")
+
+    with colB:
+        st.warning(f"💵 **Cash to Close:** ${cash_to_close:,.2f}")
+        st.write(f"📊 **Interest:** ${monthly_payment:,.2f}")
+
+    with colC:
+        st.write(f"🏡 **Property Tax:** ${monthly_property_tax:,.2f}")
+        st.write(f"🔒 **Home Insurance:** ${monthly_home_insurance:,.2f}")
+        st.write(f"🌊 **Flood Insurance:** ${monthly_flood_insurance:,.2f}")
+        st.error(f"💸 **Total Monthly Payment:** ${total_monthly_payment:,.2f}")
 
