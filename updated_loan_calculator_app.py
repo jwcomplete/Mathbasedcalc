@@ -103,12 +103,12 @@ if st.button("🧮 Calculate"):
         st.success(f"🏦 **Loan Amount:** ${loan_amount:,.2f}")
 
     with colB:
-        st.warning(f"💵 **Cash to Close:** ${cash_to_close:,.2f}")
-        st.write(f"📊 **Interest:** ${monthly_payment:,.2f}")
+        st.write(f"💵 **Cash to Close:** ${cash_to_close:,.2f}")
+        st.write(f"📊 **Interest Payment:** ${monthly_payment:,.2f}")
 
     with colC:
         st.write(f"🏡 **Property Tax:** ${monthly_property_tax:,.2f}")
         st.write(f"🔒 **Home Insurance:** ${monthly_home_insurance:,.2f}")
         st.write(f"🌊 **Flood Insurance:** ${monthly_flood_insurance:,.2f}")
-        st.error(f"💸 **Total Monthly Payment:** ${total_monthly_payment:,.2f}")
+        st.write(f"💸 **Total Monthly Payment:** ${total_monthly_payment:,.2f}")
 
