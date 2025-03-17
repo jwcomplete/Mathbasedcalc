@@ -36,47 +36,24 @@ ltv_limits = {
     "High-Balance": {1: 95, 2: 85, 3: 75, 4: 75}
 }
 
-# Function to calculate loan values
-def calculate_loan(purchase_price, interest_rate, loan_term, formula, property_tax, home_insurance, flood_insurance):
-    interest_rate = round(float(interest_rate), 3)  # Ensure explicit float conversion
-    down_payment_pct = loan_formulas[formula]["down_payment"] / 100
-    seller_concession_pct = loan_formulas[formula]["seller_concession"] / 100
-
-    total_sale_price = round(purchase_price / (1 - seller_concession_pct), 2)
-    loan_amount = round(total_sale_price * (1 - down_payment_pct), 2)
-    cash_to_close = round(total_sale_price * down_payment_pct, 2)
-
-    monthly_interest_rate = (interest_rate / 100) / 12
-    num_payments = loan_term * 12
-    monthly_payment = round((monthly_interest_rate * loan_amount) / (1 - (1 + monthly_interest_rate) ** -num_payments), 2)
-
-    # Calculate monthly taxes & insurance
-    monthly_property_tax = round(property_tax / 12, 2)
-    monthly_home_insurance = round(home_insurance / 12, 2)
-    monthly_flood_insurance = round(flood_insurance / 12, 2)
-
-    total_monthly_payment = round(monthly_payment + monthly_property_tax + monthly_home_insurance + monthly_flood_insurance, 2)
-
-    return total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment, monthly_property_tax, monthly_home_insurance, monthly_flood_insurance
-
 # Compact UI Layout
-st.title("🏡 Home Affordability Calculator")
+st.title("\U0001F3E1 Home Affordability Calculator")
 
 col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = st.number_input("💰 Price ($)", min_value=50000.0, max_value=2000000.0, step=5000.0, value=float(50000), format="%.0f")
+    purchase_price = st.number_input("💰 Price ($)", min_value=50000.0, max_value=2000000.0, step=5000.0, value=None, format="%.0f")
 
 with col2:
-    loan_term = st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=float(30), format="%.0f")
+    loan_term = st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=None, format="%.0f")
     interest_rate = st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f")
 
 with col3:
-    property_tax = st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=float(0), format="%.0f")
-    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=float(0), format="%.0f")
-    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=float(0), format="%.0f")
+    property_tax = st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=None, format="%.0f")
+    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=None, format="%.0f")
+    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=None, format="%.0f")
 
 st.markdown("---")
 
@@ -85,7 +62,7 @@ eligible_formulas = []
 for formula, values in loan_formulas.items():
     max_price = (conforming_loan_limit / (1 - values["down_payment"] / 100)) * (1 - values["seller_concession"] / 100)
 
-    if purchase_price <= max_price and values["max_ltv"] <= ltv_limits.get(occupancy_type, {}).get(num_units, 0):
+    if purchase_price and purchase_price <= max_price and values["max_ltv"] <= ltv_limits.get(occupancy_type, {}).get(num_units, 0):
         eligible_formulas.append(formula)
 
 selected_formula = st.selectbox("📜 Loan Formula", eligible_formulas)
