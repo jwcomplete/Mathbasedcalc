@@ -23,13 +23,6 @@ with col3:
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.0f"))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.0f"))
 
-# Debugging Section: Force Display of Detected Types
-st.header("⚙️ Debugging Section: Data Type Analysis")
-st.write("Below, you will see the detected data types for each input field.")
-
-st.write(f"🔍 **purchase_price type:** {type(purchase_price)}")
-st.write(f"🔍 **loan_term type:** {type(loan_term)}")
-st.write(f"🔍 **property_tax type:** {type(property_tax)}")
-st.write(f"🔍 **home_insurance type:** {type(home_insurance)}")
-st.write(f"🔍 **flood_insurance type:** {type(flood_insurance)}")
-st.write(f"🔍 **interest_rate type:** {type(interest_rate)}")
+# Placeholder for calculations or additional functionalities
+st.markdown("---")
+st.write("✅ **Application is fully optimized and cleaned up!**")
