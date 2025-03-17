@@ -22,7 +22,3 @@ with col3:
     property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0, format="%.0f"))
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.0f"))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.0f"))
-
-# Placeholder for calculations or additional functionalities
-st.markdown("---")
-st.write("✅ **Application is fully optimized and cleaned up!**")
