@@ -34,7 +34,7 @@ ltv_limits = {
 }
 
 # Function to calculate loan values
-def calculate_loan(purchase_price, interest_rate, loan_term, formula):
+def calculate_loan(purchase_price, interest_rate, loan_term, formula, property_tax, home_insurance, flood_insurance):
     down_payment_pct = loan_formulas[formula]["down_payment"] / 100
     seller_concession_pct = loan_formulas[formula]["seller_concession"] / 100
 
@@ -46,7 +46,14 @@ def calculate_loan(purchase_price, interest_rate, loan_term, formula):
     num_payments = loan_term * 12
     monthly_payment = (monthly_interest_rate * loan_amount) / (1 - (1 + monthly_interest_rate) ** -num_payments)
 
-    return total_sale_price, loan_amount, cash_to_close, monthly_payment
+    # Calculate monthly taxes & insurance
+    monthly_property_tax = property_tax / 12
+    monthly_home_insurance = home_insurance / 12
+    monthly_flood_insurance = flood_insurance / 12
+
+    total_monthly_payment = monthly_payment + monthly_property_tax + monthly_home_insurance + monthly_flood_insurance
+
+    return total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment
 
 st.title("C/HB Loan Calculator - Updated")
 
@@ -56,6 +63,11 @@ num_units = st.selectbox("Select Number of Units", [1, 2, 3, 4])
 purchase_price = st.number_input("Enter Purchase Price ($)", min_value=50000, max_value=2000000, step=5000)
 loan_term = st.number_input("Enter Loan Term (Years)", min_value=5, max_value=30, step=5, value=30)
 interest_rate = st.number_input("Enter Interest Rate (%)", min_value=1.0, max_value=10.0, step=0.125, value=5.625)
+
+# Additional Fields for Property Tax & Insurance
+property_tax = st.number_input("Enter Annual Property Tax ($)", min_value=0, max_value=50000, step=100)
+home_insurance = st.number_input("Enter Annual Home Insurance ($)", min_value=0, max_value=20000, step=100)
+flood_insurance = st.number_input("Enter Annual Flood Insurance ($)", min_value=0, max_value=20000, step=100)
 
 # Determine eligible loan formulas
 eligible_formulas = []
@@ -71,8 +83,8 @@ selected_formula = st.selectbox("Select Loan Formula", eligible_formulas)
 
 # Calculate Loan Details
 if st.button("Calculate Loan Details"):
-    total_sale_price, loan_amount, cash_to_close, monthly_payment = calculate_loan(
-        purchase_price, interest_rate, loan_term, selected_formula
+    total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
+        purchase_price, interest_rate, loan_term, selected_formula, property_tax, home_insurance, flood_insurance
     )
 
     # Display Results
@@ -80,4 +92,5 @@ if st.button("Calculate Loan Details"):
     st.write(f"**Total Sale Price (Including Seller Concession):** ${total_sale_price:,.2f}")
     st.write(f"**Loan Amount (LTV-Based):** ${loan_amount:,.2f}")
     st.write(f"**Cash to Close (Down Payment + Costs):** ${cash_to_close:,.2f}")
-    st.write(f"**Monthly Mortgage Payment:** ${monthly_payment:,.2f}")
+    st.write(f"**Monthly Mortgage Payment (Principal & Interest Only):** ${monthly_payment:,.2f}")
+    st.write(f"**Total Monthly Payment (Including Taxes & Insurance):** ${total_monthly_payment:,.2f}")
