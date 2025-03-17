@@ -67,16 +67,16 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = float(st.number_input("💰 Price ($)", value=50000.00, min_value=50000.00, max_value=999999999.00, step=5000.00, format="%.2f"))
+    purchase_price = st.number_input("💰 Price ($)", min_value=50000, max_value=2000000, step=5000, format="%d")
 
 with col2:
-    loan_term = float(st.number_input("📆 Term (Years)", value=30.00, min_value=5.00, max_value=30.00, step=5.00, format="%.0f"))
-    interest_rate = float(st.number_input("📊 Interest (%)", value=5.625, min_value=1.0, max_value=10.0, step=0.001, format="%.3f"))
+    loan_term = st.number_input("📆 Term (Years)", min_value=5, max_value=30, step=5, value=30)
+    interest_rate = st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f")
 
 with col3:
-    property_tax = float(st.number_input("🏡 Tax ($)", value=0.00, min_value=0.00, max_value=50000.00, step=0.01, format="%.2f"))
-    home_insurance = float(st.number_input("🔒 Insurance ($)", value=0.00, min_value=0.00, max_value=20000.00, step=0.01, format="%.2f"))
-    flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", value=0.00, min_value=0.00, max_value=20000.00, step=0.01, format="%.2f"))
+    property_tax = st.number_input("🏡 Tax ($)", min_value=0, max_value=50000, step=100, format="%d")
+    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0, max_value=20000, step=100, format="%d")
+    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0, max_value=20000, step=100, format="%d")
 
 st.markdown("---")
 
