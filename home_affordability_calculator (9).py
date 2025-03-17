@@ -50,9 +50,9 @@ with col2:
     interest_rate = st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f")
 
 with col3:
-    property_tax = st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0, format="%.2f")
-    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.2f")
-    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.2f")
+    property_tax = st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=1., value=0.0, format="%.2f")
+    home_insurance = st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=1., value=0.0, format="%.2f")
+    flood_insurance = st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=1., value=0.0, format="%.2f")
 
 st.markdown("---")
 
