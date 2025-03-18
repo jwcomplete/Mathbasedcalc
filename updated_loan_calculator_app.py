@@ -48,34 +48,49 @@ flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, ma
 loan_options = [key for key, values in loan_formulas.items()]
 selected_formula = st.selectbox("📜 Loan Formula", loan_options)
 
+# Function to update session state and recalculate
+def update_and_recalculate(down_payment_pct):
+    total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
+        purchase_price, loan_term, interest_rate, down_payment_pct, 
+        loan_formulas[selected_formula]["seller_concession"] / 100, 
+        property_tax, home_insurance, flood_insurance
+    )
+
+    st.session_state.update({
+        'total_sale_price': total_sale_price,
+        'loan_amount': loan_amount,
+        'cash_to_close': cash_to_close,
+        'monthly_payment': monthly_payment,
+        'total_monthly_payment': total_monthly_payment,
+        'down_payment_pct': down_payment_pct
+    })
+
 # Check eligibility and calculate
 if st.button("📊 Calculate Loan & Monthly Payment"):
     down_payment_pct = loan_formulas[selected_formula]["down_payment"] / 100
-    seller_concession_pct = loan_formulas[selected_formula]["seller_concession"] / 100
+    update_and_recalculate(down_payment_pct)
 
-    total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-        purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance
-    )
-
-    # Display results
-    st.write(f"Total Sale Price: ${total_sale_price:,.2f}")
-    st.write(f"Loan Amount: ${loan_amount:,.2f}")
-    st.write(f"Cash to Close: ${cash_to_close:,.2f}")
-    st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-    st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${total_monthly_payment:,.2f}")
+# Display results if available in session state
+if 'loan_amount' in st.session_state:
+    st.write(f"Total Sale Price: ${st.session_state.total_sale_price:,.2f}")
+    st.write(f"Loan Amount: ${st.session_state.loan_amount:,.2f}")
+    st.write(f"Cash to Close: ${st.session_state.cash_to_close:,.2f}")
+    st.write(f"Monthly Payment: ${st.session_state.monthly_payment:,.2f}")
+    st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${st.session_state.total_monthly_payment:,.2f}")
 
     # Ineligible loan handling
-    if loan_amount > max_loan_limit:
+    if st.session_state.loan_amount > max_loan_limit:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
-                    f'<strong>{selected_formula} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
+                    f'<strong>{selected_formula} is ineligible because the loan amount (${st.session_state.loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
                     unsafe_allow_html=True)
 
         # Calculate adjusted down payment to meet max loan limit
-        adjusted_down_payment = ((loan_amount - max_loan_limit) / total_sale_price * 100) + loan_formulas[selected_formula]["down_payment"]
-        new_cash_to_close = total_sale_price * (adjusted_down_payment / 100)
+        adjusted_down_payment = ((st.session_state.loan_amount - max_loan_limit) / st.session_state.total_sale_price * 100) + loan_formulas[selected_formula]["down_payment"]
+        new_cash_to_close = st.session_state.total_sale_price * (adjusted_down_payment / 100)
 
         # Button for recalculating with adjusted down payment
-        st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate\nTotal Cash to Close: ${new_cash_to_close:,.2f}")
+        if st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate\nTotal Cash to Close: ${new_cash_to_close:,.2f}"):
+            update_and_recalculate(adjusted_down_payment / 100)
 
         # Switching to next eligible formula
         next_formula = None
@@ -85,5 +100,8 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
                 break
 
         if next_formula:
-            new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
-            st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}")
+            new_cash_to_close_next = st.session_state.total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
+            if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
+                selected_formula = next_formula
+                down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
+                update_and_recalculate(down_payment_pct)
