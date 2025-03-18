@@ -15,7 +15,7 @@ loan_formulas = {
     "C.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
 }
 
-# Max Loan Limit
+# Max Loan Limit (for primary residence 1-unit standard loan)
 max_loan_limit = 806500.0
 
 # Function to calculate mortgage payments and eligibility
@@ -55,7 +55,7 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=50000.0, format="%.2f"))
+    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0, format="%.2f"))
 
 with col2:
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0, format="%.0f"))
