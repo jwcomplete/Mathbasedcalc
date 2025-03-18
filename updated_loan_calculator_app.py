@@ -91,22 +91,27 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
     )
 
     if loan_amount > max_loan_limit:
-        st.error(f"🚫 **{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).**")
+        st.markdown(
+            f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+            f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
+            unsafe_allow_html=True)
 
         # Suggest increasing down payment
         adjusted_down_payment = ((loan_amount - max_loan_limit) / total_sale_price * 100) + loan_formulas[formula_key]["down_payment"]
         additional_cash_needed = total_sale_price * (adjusted_down_payment / 100) - cash_to_close
 
-        st.warning(
-            f"💡 **Your Options:**\n"
-            f"- Increase your down payment to **{adjusted_down_payment:.2f}%**\n"
-            f"- Add **${additional_cash_needed:,.2f}** more to your cash to close\n"
+        st.markdown(
+            f"💡 **Your Options:**
+"
+            f"- Increase your down payment to **{adjusted_down_payment:.2f}%**
+"
+            f"- Add **${additional_cash_needed:,.2f}** more to your cash to close
+"
             f"- Switch to an eligible loan formula"
         )
 
         # Fix Down Payment Option
         if st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate"):
-            # Apply the updated down payment and recalculate the loan
             new_down_payment = adjusted_down_payment / 100
             new_cash_to_close = total_sale_price * new_down_payment
             new_loan_amount = total_sale_price * (1 - new_down_payment)
@@ -130,8 +135,8 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
 
         if next_formula:
             if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)"):
+
                 selected_formula = next_formula
-                # Recalculate with new formula
                 total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
                     purchase_price, loan_term, interest_rate, next_formula, property_tax, home_insurance, flood_insurance
                 )
