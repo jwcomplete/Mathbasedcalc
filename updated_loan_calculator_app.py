@@ -90,7 +90,7 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         purchase_price, loan_term, interest_rate, formula_key, property_tax, home_insurance, flood_insurance
     )
 
-    if is_ineligible:
+    if loan_amount > max_loan_limit:
         st.error(f"🚫 **{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).**")
 
         # Suggest increasing down payment
