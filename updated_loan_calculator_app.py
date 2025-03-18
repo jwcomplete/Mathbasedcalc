@@ -98,11 +98,8 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         additional_cash_needed = total_sale_price * (adjusted_down_payment / 100) - cash_to_close
 
         st.warning(
-            f"💡 **Try:**
-
-"
-            f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**
-"
+            f"💡 **Try:**\n"
+            f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**\n"
             f"- Adding **${additional_cash_needed:,.2f}** more to your cash to close"
         )
 
