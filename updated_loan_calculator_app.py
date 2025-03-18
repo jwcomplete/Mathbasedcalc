@@ -16,7 +16,7 @@ loan_formulas = {
 }
 
 # Max Loan Limit
-max_loan_limit = 999999999.0
+max_loan_limit = 806500.0
 
 # Function to calculate mortgage payments and eligibility
 def calculate_loan(purchase_price, loan_term, interest_rate, formula, property_tax, home_insurance, flood_insurance):
