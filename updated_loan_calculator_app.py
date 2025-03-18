@@ -3,9 +3,8 @@ import streamlit as st
 
 # Loan formula setup and max limits
 loan_formulas = {
-    "C.3.0": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
-    "C.3.3": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
-    "C.3.6": {"down_payment": 3, "seller_concession": 6, "max_ltv": 97},
+    "C.3.0 is 3% down with Closing cost out of pocket": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
+    "C.3.3 LOWEST OUT OF POCKET! 3% down with 3% Seller credit towards some or all closing cost": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
     "C.5.3": {"down_payment": 5, "seller_concession": 3, "max_ltv": 95},
     "C.10.6": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
     "C.15.2": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
@@ -123,3 +122,5 @@ if st.session_state.button_clicked:
                 st.write(f"Loan Amount: ${loan_amount:,.2f}")
                 st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
                 st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
+
+    
