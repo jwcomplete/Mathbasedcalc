@@ -97,11 +97,14 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         adjusted_down_payment = ((loan_amount - max_loan_limit) / total_sale_price * 100) + loan_formulas[formula_key]["down_payment"]
         additional_cash_needed = total_sale_price * (adjusted_down_payment / 100) - cash_to_close
 
-        st.warning(f"💡 **Try:**
+        st.warning(
+            f"💡 **Try:**
+
 "
-                   f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**
+            f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**
 "
-                   f"- Adding **${additional_cash_needed:,.2f}** more to your cash to close")
+            f"- Adding **${additional_cash_needed:,.2f}** more to your cash to close"
+        )
 
         # Suggest switching to the next eligible formula
         next_formula = None
