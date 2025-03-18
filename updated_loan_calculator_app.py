@@ -15,7 +15,7 @@ loan_formulas = {
     "C.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
 }
 
-# Max Loan Limit (This can be dynamic in a future update)
+# Max Loan Limit
 max_loan_limit = 999999999.0
 
 # Function to calculate mortgage payments and eligibility
@@ -92,16 +92,16 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
 
     if is_ineligible:
         st.error(f"🚫 **{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).**")
-        
+
         # Suggest increasing down payment
-        adjusted_down_payment = (loan_amount - max_loan_limit) / total_sale_price * 100 + loan_formulas[formula_key]["down_payment"]
+        adjusted_down_payment = ((loan_amount - max_loan_limit) / total_sale_price * 100) + loan_formulas[formula_key]["down_payment"]
         additional_cash_needed = total_sale_price * (adjusted_down_payment / 100) - cash_to_close
 
         st.warning(f"💡 **Try:**
 "
-                   f"- **Increasing your down payment to {adjusted_down_payment:.2f}%**
+                   f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**
 "
-                   f"- **Adding ${additional_cash_needed:,.2f} more to your cash to close**")
+                   f"- Adding **${additional_cash_needed:,.2f}** more to your cash to close")
 
         # Suggest switching to the next eligible formula
         next_formula = None
