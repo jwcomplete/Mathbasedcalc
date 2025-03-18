@@ -108,7 +108,6 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         if st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate"):
             purchase_price = total_sale_price  # Maintain sale price
             selected_formula = formula_key  # Keep the same formula
-            fix_down_payment_clicked = True
 
         # Suggest switching to the next eligible formula
         next_formula = None
@@ -120,7 +119,6 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         if next_formula:
             if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)"):
                 selected_formula = next_formula
-                switch_formula_clicked = True
 
     else:
         # Display Results
