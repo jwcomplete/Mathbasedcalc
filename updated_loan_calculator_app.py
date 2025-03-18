@@ -1,7 +1,7 @@
 
 import streamlit as st
 
-# Loan formula setup and max limits
+# Loan formula setup and max limits 
 loan_formulas = {
     "C.3.0 is 3% down with Closing cost out of pocket": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
     "C.3.3 LOWEST OUT OF POCKET! 3% down with 3% Seller credit towards some or all closing cost": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
@@ -18,25 +18,31 @@ loan_formulas = {
     "HB.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
 }
 
+# Max Loan Limit (for primary residence 1-unit standard loan)
 max_loan_limit = 806500.0
 
-# Function to calculate loan details
+# Function to calculate mortgage payments and eligibility
 def calculate_loan(purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance):
     total_sale_price = purchase_price / (1 - seller_concession_pct)
     loan_amount = total_sale_price * (1 - down_payment_pct)
     cash_to_close = total_sale_price * down_payment_pct
 
-    # Monthly mortgage calculation (PMT formula)
+    # Convert interest rate to monthly interest
     monthly_interest_rate = (interest_rate / 100) / 12
     num_payments = loan_term * 12
-    monthly_payment = (monthly_interest_rate * loan_amount) / (1 - (1 + monthly_interest_rate) ** -num_payments)
 
-    # Escrow calculations (tax, insurance, flood insurance)
+    # Monthly mortgage payment formula (PMT formula)
+    if monthly_interest_rate > 0:
+        monthly_payment = (monthly_interest_rate * loan_amount) / (1 - (1 + monthly_interest_rate) ** -num_payments)
+    else:
+        monthly_payment = loan_amount / num_payments
+
+    # Calculate escrow (taxes and insurance)
     monthly_property_tax = property_tax / 12
     monthly_home_insurance = home_insurance / 12
     monthly_flood_insurance = flood_insurance / 12
 
-    # Total monthly payment
+    # Total monthly cost
     total_monthly_payment = monthly_payment + monthly_property_tax + monthly_home_insurance + monthly_flood_insurance
 
     return total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment
@@ -46,6 +52,7 @@ st.title("🏡 Home Affordability Calculator")
 
 col1, col2, col3 = st.columns([1, 1, 1])
 
+# User input
 with col1:
     purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0))
@@ -65,7 +72,7 @@ if 'button_clicked' not in st.session_state:
     st.session_state.adjusted_down_payment = None
     st.session_state.new_cash_to_close = None
 
-# Check eligibility and calculate
+# Button click to calculate
 if st.button("📊 Calculate Loan & Monthly Payment"):
     st.session_state.button_clicked = True
 
@@ -94,16 +101,10 @@ if st.session_state.button_clicked:
         st.session_state.adjusted_down_payment = adjusted_down_payment
         st.session_state.new_cash_to_close = new_cash_to_close
 
-        if st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate\nTotal Cash to Close: ${new_cash_to_close:,.2f}"):
-            down_payment_pct = adjusted_down_payment / 100
-            total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-                purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance
-            )
+        # Button for recalculating with adjusted down payment
+        st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate\nTotal Cash to Close: ${new_cash_to_close:,.2f}")
 
-            st.write(f"Loan Amount: ${loan_amount:,.2f}")
-            st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-            st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
-
+        # Switching to next eligible formula
         next_formula = None
         for key, values in loan_formulas.items():
             if key != selected_formula and (purchase_price * (1 - values["down_payment"] / 100)) <= max_loan_limit:
@@ -112,15 +113,5 @@ if st.session_state.button_clicked:
 
         if next_formula:
             new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
-            if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
-                selected_formula = next_formula
-                down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
-                total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-                    purchase_price, loan_term, interest_rate, down_payment_pct, loan_formulas[next_formula]["seller_concession"] / 100, property_tax, home_insurance, flood_insurance
-                )
+            st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}")
 
-                st.write(f"Loan Amount: ${loan_amount:,.2f}")
-                st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
-
-    
