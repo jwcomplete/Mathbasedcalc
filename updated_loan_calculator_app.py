@@ -113,8 +113,7 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
 
         st.markdown(
     f"💡 **Your Options:**\n"
-    f"- Increase your down payment to 
-    **{adjusted_down_payment:.2f}%**\n"
+    f"- Increase your down payment to **{adjusted_down_payment:.2f}%**\n"
     f"- Add **${additional_cash_needed:,.2f}** more to your cash to close\n"
     f"- Switch to an eligible loan formula"
 )
