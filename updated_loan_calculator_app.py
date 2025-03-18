@@ -117,8 +117,7 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
 
         # Button for increasing down payment and recalculating
         st.button(
-            f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate"
-            f" - Total Cash to Close: ${new_cash_to_close:,.2f}"
+            f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate - Total Cash to Close: ${new_cash_to_close:,.2f}"
         )
 
         # Button to switch to the next eligible formula
