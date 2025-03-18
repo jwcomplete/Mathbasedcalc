@@ -98,10 +98,17 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         additional_cash_needed = total_sale_price * (adjusted_down_payment / 100) - cash_to_close
 
         st.warning(
-            f"💡 **Try:**\n"
-            f"- Increasing your down payment to **{adjusted_down_payment:.2f}%**\n"
-            f"- Adding **${additional_cash_needed:,.2f}** more to your cash to close"
+            f"💡 **Your Options:**\n"
+            f"- Increase your down payment to **{adjusted_down_payment:.2f}%**\n"
+            f"- Add **${additional_cash_needed:,.2f}** more to your cash to close\n"
+            f"- Switch to an eligible loan formula"
         )
+
+        # Fix Down Payment Option
+        if st.button(f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate"):
+            purchase_price = total_sale_price  # Maintain sale price
+            selected_formula = formula_key  # Keep the same formula
+            fix_down_payment_clicked = True
 
         # Suggest switching to the next eligible formula
         next_formula = None
@@ -111,9 +118,9 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
                 break
 
         if next_formula:
-            st.info(f"💡 **Or switch to `{next_formula}` (next eligible formula) automatically.**")
-            if st.button(f"✅ Apply `{next_formula}` & Recalculate"):
+            if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)"):
                 selected_formula = next_formula
+                switch_formula_clicked = True
 
     else:
         # Display Results
