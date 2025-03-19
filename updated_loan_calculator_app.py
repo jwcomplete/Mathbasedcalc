@@ -67,6 +67,7 @@ with col3:
     property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0))
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
+max_loan_limit = loan_limits[num_units]["high_balance"]
 
 loan_options = [key for key, values in loan_formulas.items()]
 selected_formula = st.selectbox("📜 Loan Formula", loan_options)
