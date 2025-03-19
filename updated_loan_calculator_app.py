@@ -159,7 +159,6 @@ if st.session_state.button_clicked:
             st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                         f'<strong>Selected formula is not allowed for Second Home with LTV exceeding 90%.</strong></div>',
                         unsafe_allow_html=True)
-            return
         else:
             max_seller_concession = 0.06
     elif occupancy_type == "Investment Property":
@@ -169,4 +168,4 @@ if st.session_state.button_clicked:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                     f'<strong>Seller concession exceeds the allowed limit for {occupancy_type}.</strong></div>',
                     unsafe_allow_html=True)
-        return
+    
