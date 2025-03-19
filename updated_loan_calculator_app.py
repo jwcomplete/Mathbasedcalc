@@ -1,29 +1,38 @@
 import streamlit as st
 
-# **Loan Limits for Conforming & High-Balance Loans**
-loan_limits = {
-    1: {"conforming": 806500, "high_balance": 1209750},
-    2: {"conforming": 1032650, "high_balance": 1548975},
-    3: {"conforming": 1248150, "high_balance": 1872225},
-    4: {"conforming": 1551250, "high_balance": 2326875}
-}
+# Set Page Configuration for a Compact UI
+st.set_page_config(page_title="Home Affordability Calculator", layout="wide")
 
-# **Loan Formulas with Updated Descriptions**
+# Define Loan Limits
+conforming_loan_limit = 806500.00
+high_balance_loan_limit = 1000000.00
+
+# Define available C & HB Formulas with Down Payment, Seller Concessions, and LTV Restrictions
 loan_formulas = {
-    "C.3.0 – 3% down with closing costs out of pocket": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
-    "C.3.3 – 3% down with 3% seller credit towards closing costs": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
-    "C.5.0 – Low out of pocket with 5% down and 0% seller credit": {"down_payment": 5, "seller_concession": 0, "max_ltv": 95},
-    "C.5.3 – Low out of pocket with 5% down and 3% seller credit": {"down_payment": 5, "seller_concession": 3, "max_ltv": 95},
-    "C.10.0 – Optimized combo with 10% down and 0% seller credit": {"down_payment": 10, "seller_concession": 0, "max_ltv": 90},
-    "C.10.6 – Optimized combo with 10% down and 6% seller credit": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
-    "HB.10.6 – High-balance formula with 10% down and 6% seller credit": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
-    "HB.15.2 – High-balance formula with 15% down and 2% seller credit": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
-    "HB.20.2 – High-balance formula with 20% down and 2% seller credit": {"down_payment": 20, "seller_concession": 2, "max_ltv": 80},
-    "HB.25.2 – High-balance formula with 25% down and 2% seller credit": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75}
+    "C.3.0": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
+    "C.3.3": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
+    "C.3.6": {"down_payment": 3, "seller_concession": 6, "max_ltv": 97},
+    "C.5.3": {"down_payment": 5, "seller_concession": 3, "max_ltv": 95},
+    "C.10.6": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
+    "C.15.2": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
+    "C.20.2": {"down_payment": 20, "seller_concession": 2, "max_ltv": 80},
+    "C.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
+    "HB.3.3": {"down_payment": 3, "seller_concession": 3, "max_ltv": 95},
+    "HB.3.6": {"down_payment": 3, "seller_concession": 6, "max_ltv": 95},
+    "HB.10.6": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
+    "HB.15.2": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
+    "HB.20.2": {"down_payment": 20, "seller_concession": 2, "max_ltv": 80},
+    "HB.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
 }
 
-# **Function to Calculate Loan Details**
-def calculate_loan(purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance):
+# Max Loan Limit (for primary residence 1-unit standard loan)
+max_loan_limit = 806500.0
+
+# Function to calculate mortgage payments and eligibility
+def calculate_loan(purchase_price, loan_term, interest_rate, formula, property_tax, home_insurance, flood_insurance):
+    down_payment_pct = loan_formulas[formula]["down_payment"] / 100
+    seller_concession_pct = loan_formulas[formula]["seller_concession"] / 100
+
     total_sale_price = purchase_price / (1 - seller_concession_pct)
     loan_amount = total_sale_price * (1 - down_payment_pct)
     cash_to_close = total_sale_price * down_payment_pct
@@ -48,35 +57,32 @@ def calculate_loan(purchase_price, loan_term, interest_rate, down_payment_pct, s
 
     return total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment
 
-# **Streamlit UI Setup**
-st.title("Home Affordability Calculator")
+# UI Layout
+st.title("🏡 Home Affordability Calculator")
 
 col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
-
-# **Determine the Max Loan Limit Based on Number of Units**
-selected_loan_limit = loan_limits[num_units]["conforming"]
-high_balance_limit = loan_limits[num_units]["high_balance"]
+    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0, format="%.2f"))
 
 with col2:
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0, format="%.0f"))
-    interest_rate = float(st.number_input("📊 Interest Rate (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625))
+    interest_rate = float(st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625, format="%.3f"))
 
 with col3:
-    property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0))
-    home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
-    flood_insurance = float(st.number_input("🌊 Flood Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
+    property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0, format="%.2f"))
+    home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.2f"))
+    flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0, format="%.2f"))
 
-# Loan Formula Selection
+st.markdown("---")
+
 # Loan Formula Selection
 loan_options = []
 for key, values in loan_formulas.items():
     estimated_loan_amount = purchase_price * (1 - values["down_payment"] / 100)
-    if estimated_loan_amount > selected_loan_limit:  # Corrected line
+    if estimated_loan_amount > max_loan_limit:
         loan_options.append(f"{key} 🚫")
     else:
         loan_options.append(key)
@@ -89,26 +95,12 @@ is_ineligible = "🚫" in selected_formula
 # Calculate Button
 if st.button("📊 Calculate Loan & Monthly Payment"):
     formula_key = selected_formula.replace(" 🚫", "")
-    formula = loan_formulas[formula_key]
 
     total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-        purchase_price,
-        loan_term,
-        interest_rate,
-        formula["down_payment"] / 100,
-        formula["seller_concession"] / 100,
-        property_tax,
-        home_insurance,
-        flood_insurance
+        purchase_price, loan_term, interest_rate, formula_key, property_tax, home_insurance, flood_insurance
     )
 
-    max_loan_limit = selected_loan_limit  # Define max_loan_limit before using it
-
     if loan_amount > max_loan_limit:
-        st.markdown(
-            f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
-            f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
-            unsafe_allow_html=True)
         st.markdown(
             f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
             f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
@@ -124,8 +116,8 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
 
         # Button for increasing down payment and recalculating
         st.button(
-            f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate"
-
+            f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate
+"
             f" - Total Cash to Close: ${new_cash_to_close:,.2f}"
         )
 
@@ -141,6 +133,7 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
             new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
             
             st.button(
-                f"🔄 Switch to `{next_formula}` (Eligible Formula)"
+                f"🔄 Switch to `{next_formula}` (Eligible Formula)
+"
                 f" - Total Cash to Close: ${new_cash_to_close_next:,.2f}"
             )
