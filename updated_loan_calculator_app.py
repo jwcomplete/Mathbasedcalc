@@ -56,10 +56,10 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
+    purchase_price = float(st.number_input("💰 Price ($) - Col1", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
 
 with col2:
-    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
+    purchase_price = float(st.number_input("💰 Price ($) - Col2", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0))
     interest_rate = float(st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625))
 
