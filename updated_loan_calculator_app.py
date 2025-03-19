@@ -102,7 +102,13 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
         flood_insurance
     )
 
+    max_loan_limit = selected_loan_limit  # Define max_loan_limit before using it
+
     if loan_amount > max_loan_limit:
+        st.markdown(
+            f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+            f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
+            unsafe_allow_html=True)
         st.markdown(
             f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
             f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
