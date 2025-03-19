@@ -19,7 +19,13 @@ loan_formulas = {
     "HB.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
 }
 
-max_loan_limit = 806500.0
+# **Loan Limits for Conforming & High-Balance Loans**
+loan_limits = {
+    1: {"conforming": 806500, "high_balance": 1209750},
+    2: {"conforming": 1032650, "high_balance": 1548975},
+    3: {"conforming": 1248150, "high_balance": 1872225},
+    4: {"conforming": 1551250, "high_balance": 2326875}
+}
 
 # Function to calculate loan details
 def calculate_loan(purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance):
@@ -48,11 +54,16 @@ st.title("🏡 Home Affordability Calculator")
 col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
+    occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
+    num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
+    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
+
+with col2:
     purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0))
     interest_rate = float(st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625))
 
-with col2:
+with col3:
     property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0))
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
