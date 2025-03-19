@@ -104,4 +104,4 @@ if 'loan_amount' in st.session_state:
             if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
                 selected_formula = next_formula
                 down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
-                update_and_recalculate(down_payment_pct)otal_monthly_payment:,.2f}")
+                update_and_recalculate(down_payment_pct)
