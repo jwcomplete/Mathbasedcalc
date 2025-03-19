@@ -102,8 +102,43 @@ if st.session_state.button_clicked:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                     f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the limit for 1-unit property (${loan_limits[1]["conforming"]:,.2f}).</strong></div>',
                     unsafe_allow_html=True)
-        if st.button("🔄 Adjust Loan Amount"):
-            st.session_state.button_clicked = False
+
+        # Option to apply new down payment and recalculate
+        adjusted_down_payment_pct = ((loan_amount - loan_limits[1]["conforming"]) / total_sale_price) + down_payment_pct
+        new_cash_to_close = total_sale_price * adjusted_down_payment_pct
+
+        st.session_state.adjusted_down_payment = adjusted_down_payment_pct
+        st.session_state.new_cash_to_close = new_cash_to_close
+
+        if st.button(f"✅ Apply {adjusted_down_payment_pct:.2f}% Down Payment & Recalculate\nTotal Cash to Close: ${new_cash_to_close:,.2f}"):
+            down_payment_pct = adjusted_down_payment_pct
+            total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
+                purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance
+            )
+
+            st.write(f"Loan Amount: ${loan_amount:,.2f}")
+            st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
+            st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
+
+        # Option to switch to the next eligible formula
+        next_formula = None
+        for key, values in loan_formulas.items():
+            if key != selected_formula and (purchase_price * (1 - values["down_payment"] / 100)) <= max_loan_limit:
+                next_formula = key
+                break
+
+        if next_formula:
+            new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
+            if st.button(f"🔄 Switch to {next_formula} (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
+                selected_formula = next_formula
+                down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
+                total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
+                    purchase_price, loan_term, interest_rate, down_payment_pct, loan_formulas[next_formula]["seller_concession"] / 100, property_tax, home_insurance, flood_insurance
+                )
+
+                st.write(f"Loan Amount: ${loan_amount:,.2f}")
+                st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
+                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
 
     # Check if the loan amount exceeds the max loan limit
     if loan_amount > max_loan_limit:
@@ -168,4 +203,3 @@ if st.session_state.button_clicked:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                     f'<strong>Seller concession exceeds the allowed limit for {occupancy_type}.</strong></div>',
                     unsafe_allow_html=True)
-    
