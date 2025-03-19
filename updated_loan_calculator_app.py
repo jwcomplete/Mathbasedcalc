@@ -236,3 +236,4 @@ if st.session_state.button_clicked:
 
     if seller_concession_pct > max_seller_concession:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+                    f'<strong>Seller concession exceeds the allowed limit for {occup
