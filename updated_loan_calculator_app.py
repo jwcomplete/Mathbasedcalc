@@ -18,7 +18,6 @@ loan_formulas = {
     "C.25.0 – Investment property with 25% down and 0% seller credit": {"down_payment": 25, "seller_concession": 0, "max_ltv": 75},
     "C.25.2 – Investment property with 25% down and 2% seller credit": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
     "C.25.6 – Investment property with 25% down and 6% seller credit": {"down_payment": 25, "seller_concession": 6, "max_ltv": 75},
-    "C.25.9 – Investment property with 25% down and 9% seller credit": {"down_payment": 25, "seller_concession": 9, "max_ltv": 75},
     "HB.10.0 – High-balance formula with 10% down and 0% seller credit": {"down_payment": 10, "seller_concession": 0, "max_ltv": 90},
     "HB.10.6 – High-balance formula with 10% down and 6% seller credit": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
     "HB.15.0 – High-balance formula with 15% down and 0% seller credit": {"down_payment": 15, "seller_concession": 0, "max_ltv": 85},
@@ -108,14 +107,14 @@ if st.session_state.button_clicked:
     st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
     st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${total_monthly_payment:,.2f}")
 
-    # Check if the loan amount exceeds the conforming limit for 1-unit property
-    if num_units == 1 and loan_amount > loan_limits[1]["conforming"]:
+    # Validate conforming formulas
+    if selected_formula.startswith("C") and loan_amount > loan_limits[num_units]["conforming"]:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
-                    f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the limit for 1-unit property (${loan_limits[1]["conforming"]:,.2f}).</strong></div>',
+                    f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the conforming limit for {num_units}-unit property (${loan_limits[num_units]["conforming"]:,.2f}).</strong></div>',
                     unsafe_allow_html=True)
 
         # Option to apply new down payment and recalculate
-        adjusted_down_payment_pct = ((loan_amount - loan_limits[1]["conforming"]) / total_sale_price) + down_payment_pct
+        adjusted_down_payment_pct = ((loan_amount - loan_limits[num_units]["conforming"]) / total_sale_price) + down_payment_pct
         new_cash_to_close = total_sale_price * adjusted_down_payment_pct
 
         st.session_state.adjusted_down_payment = adjusted_down_payment_pct
@@ -134,7 +133,32 @@ if st.session_state.button_clicked:
         # Option to switch to the next eligible formula
         next_formula = None
         for key, values in loan_formulas.items():
-            if key != selected_formula and (purchase_price * (1 - values["down_payment"] / 100)) <= max_loan_limit:
+            if key != selected_formula and key.startswith("C") and (purchase_price * (1 - values["down_payment"] / 100)) <= loan_limits[num_units]["conforming"]:
+                next_formula = key
+                break
+
+        if next_formula:
+            new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
+            if st.button(f"🔄 Switch to {next_formula} (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
+                selected_formula = next_formula
+                down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
+                total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
+                    purchase_price, loan_term, interest_rate, down_payment_pct, loan_formulas[next_formula]["seller_concession"] / 100, property_tax, home_insurance, flood_insurance
+                )
+
+                st.write(f"Loan Amount: ${loan_amount:,.2f}")
+                st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
+                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
+
+    # Validate high balance formulas
+    elif selected_formula.startswith("HB") and (loan_amount <= loan_limits[num_units]["conforming"] or loan_amount > loan_limits[num_units]["high_balance"]):
+        st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+                    f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the high-balance limit for {num_units}-unit property (${loan_limits[num_units]["high_balance"]:,.2f}) or is below the conforming limit (${loan_limits[num_units]["conforming"]:,.2f}).</strong></div>',
+                    unsafe_allow_html=True)
+
+        next_formula = None
+        for key, values in loan_formulas.items():
+            if key != selected_formula and key.startswith("HB") and (loan_limits[num_units]["conforming"] < purchase_price * (1 - values["down_payment"] / 100) <= loan_limits[num_units]["high_balance"]):
                 next_formula = key
                 break
 
@@ -212,5 +236,3 @@ if st.session_state.button_clicked:
 
     if seller_concession_pct > max_seller_concession:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
-                    f'<strong>Seller concession exceeds the allowed limit for {occupancy_type}.</strong></div>',
-                    unsafe_allow_html=True)
