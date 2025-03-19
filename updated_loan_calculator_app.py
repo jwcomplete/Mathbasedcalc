@@ -72,10 +72,11 @@ with col3:
     flood_insurance = float(st.number_input("🌊 Flood Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
 
 # Loan Formula Selection
+# Loan Formula Selection
 loan_options = []
 for key, values in loan_formulas.items():
     estimated_loan_amount = purchase_price * (1 - values["down_payment"] / 100)
-    if estimated_loan_amount > max_loan_limit:
+    if estimated_loan_amount > selected_loan_limit:  # Corrected line
         loan_options.append(f"{key} 🚫")
     else:
         loan_options.append(key)
