@@ -56,10 +56,9 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     occupancy_type = st.selectbox("🏠 Occupancy", ["Primary Residence", "Second Home", "Investment Property"])
     num_units = st.selectbox("🏢 Units", [1, 2, 3, 4])
-    purchase_price = float(st.number_input("💰 Price ($) - Col1", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
+    purchase_price = float(st.number_input("💰 Price ($)", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
 
 with col2:
-    purchase_price = float(st.number_input("💰 Price ($) - Col2", min_value=50000.0, max_value=999999999.0, step=5000.0, value=807000.0))
     loan_term = float(st.number_input("📆 Term (Years)", min_value=5.0, max_value=30.0, step=5.0, value=30.0))
     interest_rate = float(st.number_input("📊 Interest (%)", min_value=1.0, max_value=10.0, step=0.001, value=5.625))
 
@@ -68,7 +67,7 @@ with col3:
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
 
-# Add this line to define the max loan limit
+# Determine the max loan limit based on the number of units
 max_loan_limit = loan_limits[num_units]["high_balance"]
 
 loan_options = [key for key, values in loan_formulas.items()]
@@ -98,15 +97,15 @@ if st.session_state.button_clicked:
     st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
     st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${total_monthly_payment:,.2f}")
 
-    # Check if unit is 1 and loan amount exceeds limit
+    # Check if the loan amount exceeds the conforming limit for 1-unit property
     if num_units == 1 and loan_amount > loan_limits[1]["conforming"]:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                     f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the limit for 1-unit property (${loan_limits[1]["conforming"]:,.2f}).</strong></div>',
                     unsafe_allow_html=True)
         if st.button("🔄 Adjust Loan Amount"):
-            # Handle the adjustment action here
-            st.session_state.button_clicked = False  # Reset the button click state to allow recalculation
+            st.session_state.button_clicked = False
 
+    # Check if the loan amount exceeds the max loan limit
     if loan_amount > max_loan_limit:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
                     f'<strong>{selected_formula} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
@@ -146,3 +145,28 @@ if st.session_state.button_clicked:
                 st.write(f"Loan Amount: ${loan_amount:,.2f}")
                 st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
                 st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
+
+    # Check LTV limits based on occupancy type
+    ltv = (loan_amount / total_sale_price) * 100
+
+    if occupancy_type == "Primary Residence":
+        if ltv > 90:
+            max_seller_concession = 0.03
+        else:
+            max_seller_concession = 0.06
+    elif occupancy_type == "Second Home":
+        if ltv > 90:
+            st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+                        f'<strong>Selected formula is not allowed for Second Home with LTV exceeding 90%.</strong></div>',
+                        unsafe_allow_html=True)
+            return
+        else:
+            max_seller_concession = 0.06
+    elif occupancy_type == "Investment Property":
+        max_seller_concession = 0.02
+
+    if seller_concession_pct > max_seller_concession:
+        st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+                    f'<strong>Seller concession exceeds the allowed limit for {occupancy_type}.</strong></div>',
+                    unsafe_allow_html=True)
+        return
