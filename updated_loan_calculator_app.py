@@ -71,26 +71,62 @@ with col3:
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
     flood_insurance = float(st.number_input("🌊 Flood Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
 
-loan_options = [key for key, values in loan_formulas.items()]
+# Loan Formula Selection
+loan_options = []
+for key, values in loan_formulas.items():
+    estimated_loan_amount = purchase_price * (1 - values["down_payment"] / 100)
+    if estimated_loan_amount > max_loan_limit:
+        loan_options.append(f"{key} 🚫")
+    else:
+        loan_options.append(key)
+
 selected_formula = st.selectbox("📜 Loan Formula", loan_options)
 
+# Check if the selected formula is eligible
+is_ineligible = "🚫" in selected_formula
+
+# Calculate Button
 if st.button("📊 Calculate Loan & Monthly Payment"):
-    down_payment_pct = loan_formulas[selected_formula]["down_payment"] / 100
-    seller_concession_pct = loan_formulas[selected_formula]["seller_concession"] / 100
+    formula_key = selected_formula.replace(" 🚫", "")
 
     total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-        purchase_price, loan_term, interest_rate, down_payment_pct, seller_concession_pct, property_tax, home_insurance, flood_insurance
+        purchase_price, loan_term, interest_rate, formula_key, property_tax, home_insurance, flood_insurance
     )
 
-    st.write(f"Total Sale Price: ${total_sale_price:,.2f}")
-    st.write(f"Loan Amount: ${loan_amount:,.2f}")
-    st.write(f"Cash to Close: ${cash_to_close:,.2f}")
-    st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-    st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${total_monthly_payment:,.2f}")
+    if loan_amount > max_loan_limit:
+        st.markdown(
+            f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+            f'<strong>{formula_key} is ineligible because the loan amount (${loan_amount:,.2f}) exceeds the max loan limit (${max_loan_limit:,.2f}).</strong></div>',
+            unsafe_allow_html=True)
 
-    if loan_amount > selected_loan_limit:
-        st.error(f"🚨 Loan amount **${loan_amount:,.2f}** exceeds conforming limit **${selected_loan_limit:,.2f}**!")
+        # Suggest increasing down payment
+        adjusted_down_payment = ((loan_amount - max_loan_limit) / total_sale_price * 100) + loan_formulas[formula_key]["down_payment"]
+        new_cash_to_close = total_sale_price * (adjusted_down_payment / 100)
 
-        if loan_amount <= high_balance_limit:
-            st.success(f"✅ Consider switching to a **High-Balance Loan** with a limit of **${high_balance_limit:,.2f}**.")
+        st.markdown(
+            f"💡 **Your Options:**"
+        )
 
+        # Button for increasing down payment and recalculating
+        st.button(
+            f"✅ Apply {adjusted_down_payment:.2f}% Down Payment & Recalculate
+"
+            f" - Total Cash to Close: ${new_cash_to_close:,.2f}"
+        )
+
+        # Button to switch to the next eligible formula
+        next_formula = None
+        for key, values in loan_formulas.items():
+            if key != formula_key and (purchase_price * (1 - values["down_payment"] / 100)) <= max_loan_limit:
+                next_formula = key
+                break
+
+        if next_formula:
+            # Recalculate total cash to close for the next eligible formula
+            new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
+            
+            st.button(
+                f"🔄 Switch to `{next_formula}` (Eligible Formula)
+"
+                f" - Total Cash to Close: ${new_cash_to_close_next:,.2f}"
+            )
