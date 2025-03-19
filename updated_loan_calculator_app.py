@@ -89,10 +89,18 @@ is_ineligible = "🚫" in selected_formula
 # Calculate Button
 if st.button("📊 Calculate Loan & Monthly Payment"):
     formula_key = selected_formula.replace(" 🚫", "")
+    formula = loan_formulas[formula_key]
 
     total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
-        purchase_price, loan_term, interest_rate, formula_key, property_tax, home_insurance, flood_insurance
-    ) 
+        purchase_price,
+        loan_term,
+        interest_rate,
+        formula["down_payment"] / 100,
+        formula["seller_concession"] / 100,
+        property_tax,
+        home_insurance,
+        flood_insurance
+    )
 
     if loan_amount > max_loan_limit:
         st.markdown(
