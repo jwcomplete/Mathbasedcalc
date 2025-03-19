@@ -67,6 +67,8 @@ with col3:
     property_tax = float(st.number_input("🏡 Tax ($)", min_value=0.0, max_value=50000.0, step=100.0, value=0.0))
     home_insurance = float(st.number_input("🔒 Insurance ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
     flood_insurance = float(st.number_input("🌊 Flood Ins. ($)", min_value=0.0, max_value=20000.0, step=100.0, value=0.0))
+
+# Add this line to define the max loan limit
 max_loan_limit = loan_limits[num_units]["high_balance"]
 
 loan_options = [key for key, values in loan_formulas.items()]
@@ -95,6 +97,15 @@ if st.session_state.button_clicked:
     st.write(f"Cash to Close: ${cash_to_close:,.2f}")
     st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
     st.write(f"Total Monthly Payment (Including Taxes & Insurance): ${total_monthly_payment:,.2f}")
+
+    # Check if unit is 1 and loan amount exceeds limit
+    if num_units == 1 and loan_amount > loan_limits[1]["conforming"]:
+        st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
+                    f'<strong>Loan amount (${loan_amount:,.2f}) exceeds the limit for 1-unit property (${loan_limits[1]["conforming"]:,.2f}).</strong></div>',
+                    unsafe_allow_html=True)
+        if st.button("🔄 Adjust Loan Amount"):
+            # Handle the adjustment action here
+            st.session_state.button_clicked = False  # Reset the button click state to allow recalculation
 
     if loan_amount > max_loan_limit:
         st.markdown(f'<div style="background-color:red; color:white; padding:10px; font-size:16px;">'
@@ -134,4 +145,4 @@ if st.session_state.button_clicked:
 
                 st.write(f"Loan Amount: ${loan_amount:,.2f}")
                 st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}") 
+                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
