@@ -1,22 +1,15 @@
-import streamlit as st
+ import streamlit as st
 
 # Loan formula setup and max limits
 loan_formulas = {
-    "C.3.0 is 3% down with Closing cost out of pocket": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
-    "C.3.3 LOWEST OUT OF POCKET! 3% down with 3% Seller credit towards some or all closing cost": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
-    "C.5.0 Low out of pocket w/Better Rates! 5% down with 0% seller credit towards some or all closing cost": {"down_payment": 5, "seller_concession": 0, "max_ltv": 95},
-    "C.5.3 Low out of pocket w/Better Rates! 5% down with 0% seller credit towards some or all closing cost": {"down_payment": 5, "seller_concession": 3, "max_ltv": 95},
-    "C.10.0 10% down with 0% seller credit towards closing cost": {"down_payment": 10, "seller_concession": 0, "max_ltv": 90},
-    "C.10.6 ✅OPTIMIZED COMBO! BEST PAYMENTS WITH LOWEST OUT OF POCKET AND BEST RATES! 3% down with 3% Seller credit towards some or all closing cost": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
-    "C.15.6 Special Investment! 15% down with 6% seller credit towards closing cost": {"down_payment": 15, "seller_concession": 6, "max_ltv": 85},
-    "C.15.0 Investment Property 15% down with 0% seller credit towards closing cost": {"down_payment": 15, "seller_concession": 0, "max_ltv": 85},
-    "C.15.2 SFR Investment property min-down with 2% seller credit towards closing cost": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
-    "C.20.0 Investment property 20% down with 0% seller credit towards closing cost": {"down_payment": 20, "seller_concession": 0, "max_ltv": 80},
-    "C.20.6 Investment property 20% down with 6% seller credit towards closing cost": {"down_payment": 20, "seller_concession": 6, "max_ltv": 80},
-    "C.20.2 Investment property 20% down with 2% seller credit towards closing cost": {"down_payment": 20, "seller_concession": 2, "max_ltv": 80},
-    "C.25.6 Investment property 25% down with 6% seller credit towards closing cost": {"down_payment": 25, "seller_concession": 6, "max_ltv": 75},
-    "C.25.0 Investment property 25% down with 0% seller credit towards closing cost": {"down_payment": 25, "seller_concession": 0, "max_ltv": 75},
-    "C.25.2 Investment property 25% down with 2% seller credit towards closing cost": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
+    "C.3.0": {"down_payment": 3, "seller_concession": 0, "max_ltv": 97},
+    "C.3.3": {"down_payment": 3, "seller_concession": 3, "max_ltv": 97},
+    "C.3.6": {"down_payment": 3, "seller_concession": 6, "max_ltv": 97},
+    "C.5.3": {"down_payment": 5, "seller_concession": 3, "max_ltv": 95},
+    "C.10.6": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
+    "C.15.2": {"down_payment": 15, "seller_concession": 2, "max_ltv": 85},
+    "C.20.2": {"down_payment": 20, "seller_concession": 2, "max_ltv": 80},
+    "C.25.2": {"down_payment": 25, "seller_concession": 2, "max_ltv": 75},
     "HB.3.3": {"down_payment": 3, "seller_concession": 3, "max_ltv": 95},
     "HB.3.6": {"down_payment": 3, "seller_concession": 6, "max_ltv": 95},
     "HB.10.6": {"down_payment": 10, "seller_concession": 6, "max_ltv": 90},
@@ -119,7 +112,7 @@ if st.session_state.button_clicked:
 
         if next_formula:
             new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
-            if st.button(f"🔄 Switch to `{next_formula}` (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
+            if st.button(f"🔄 Switch to {next_formula} (Eligible Formula)\nTotal Cash to Close: ${new_cash_to_close_next:,.2f}"):
                 selected_formula = next_formula
                 down_payment_pct = loan_formulas[next_formula]["down_payment"] / 100
                 total_sale_price, loan_amount, cash_to_close, monthly_payment, total_monthly_payment = calculate_loan(
@@ -128,4 +121,4 @@ if st.session_state.button_clicked:
 
                 st.write(f"Loan Amount: ${loan_amount:,.2f}")
                 st.write(f"Monthly Payment: ${monthly_payment:,.2f}")
-                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}")
+                st.write(f"Total Monthly Payment: ${total_monthly_payment:,.2f}") 
