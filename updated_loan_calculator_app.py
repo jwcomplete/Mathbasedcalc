@@ -1,4 +1,4 @@
-vimport streamlit as st
+import streamlit as st
 
 # Loan formula setup and max limits
 loan_formulas = {
