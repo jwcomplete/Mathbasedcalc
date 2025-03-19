@@ -126,7 +126,6 @@ if st.button("📊 Calculate Loan & Monthly Payment"):
             new_cash_to_close_next = total_sale_price * (loan_formulas[next_formula]["down_payment"] / 100)
             
             st.button(
-                f"🔄 Switch to `{next_formula}` (Eligible Formula)
-"
+                f"🔄 Switch to `{next_formula}` (Eligible Formula)"
                 f" - Total Cash to Close: ${new_cash_to_close_next:,.2f}"
             )
